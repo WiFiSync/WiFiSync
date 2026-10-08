@@ -156,31 +156,9 @@ probe, plan, snapshot, and restore logic on a development machine.
 
 | Workflow | Trigger | Contents |
 |----------|---------|----------|
-| `ci.yml` | push / PR / manual | Source checks only: `fmt` + `clippy -D warnings` + `cargo test` + the end-to-end smoke test, all compiled for `x86_64-unknown-linux-musl` |
-| `release.yml` | manual only: the tag is typed into the dispatch form | Official **.ipk (24.10) / .apk (25.12)** packages for 7 architectures + the architecture independent `luci-app-wifisync` packages, the binary size gate, sha256 and the GitHub Release upload |
-
-`release.yml` is the only place that builds installable packages, and it
-publishes exactly two OpenWrt releases: **24.10** as `.ipk` and **25.12** as
-`.apk`. Every asset is a tarball named `wifisync-<tag>-openwrt-24.10-<arch>.tar.gz`
-(or `…-25.12-…` for the apk line), plus one `wifisync-<tag>-openwrt-24.10-luci.tar.gz`
-per release for the LuCI application and its translations (those packages are
-architecture independent, hence one tarball per release instead of one per
-architecture). The exact SDK release each package came from is recorded in the
-`package-info.json` inside every tarball.
-
-### Releasing by hand
-
-`release.yml` has no tag-push trigger, because the tag is an input. A run
-
-1. validates the tag (letters, digits, `.`, `_`, `-` only) and checks whether it exists: an unknown
-   tag is created at the commit the run was dispatched from, a known one decides which commit is
-   built;
-2. builds the packages for that commit, and
-3. deletes a release left over from an earlier run, then publishes this one — the tag itself is
-   never rewritten.
-
-A single failed architecture is retried with "Re-run failed jobs" on the run page instead of
-building a subset, so a published release is never incomplete.
+| `ci.yml` | push / PR / manual | ① `fmt` + `clippy -D warnings` + `cargo test` + end-to-end smoke test, compiled for `x86_64-unknown-linux-musl`<br>② `shellcheck` + JSON validation + `node --check` (LuCI JS) + translation catalog coverage + backend/front-end message key consistency<br>③ cross-compile 7 architectures with the SDK toolchain + size gate + upload artifacts<br>④ build `luci-app-wifisync` with `openwrt/gh-action-sdk` to validate the feed package layout |
+| `openwrt-packages.yml` | manual / monthly | Official **.apk/.ipk** builds for 7 architectures (slow, includes the rustc bootstrap) |
+| `release.yml` | tag `v*` | Build 7 architectures + sha256 + publish to GitHub Release (with an architecture reference table) |
 
 ### The "zero intrusion" invariants enforced by the smoke test
 

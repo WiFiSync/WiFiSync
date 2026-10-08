@@ -391,7 +391,7 @@ wifisync ubus ...        # rpcd exec 插件模式
 
 | 里程碑 | 状态 | 产出 |
 |--------|------|------|
-| M0 可行性验证 | ✅ 完成（工具链/架构映射/编译链路） | `scripts/openwrt-arch.sh`、`scripts/sdk-env.sh`、`scripts/build-musl.sh`、两套 CI workflow |
+| M0 可行性验证 | ✅ 完成（工具链/架构映射/编译链路） | `scripts/openwrt-arch.sh`、`scripts/sdk-env.sh`、`scripts/build-musl.sh`、CI 三件套 |
 | M1 核心逻辑库 | ✅ 完成 | `wifisync-core`：`role` / `capability` / `bridge` / `wifi_source` / `profile` / `admission` / `backup` / `failsafe` / `plan` / `uci_file` / `config` / `lan` / `link`（91 个单测） |
 | M2 系统适配层 | ✅ 完成（只读探测 + 快照/恢复 + AP 写入通道） | `wifisync-sys`：`sysfs` / `iwinfo` / `uci` / `netifd` / `snapshot` / `restore` / `state` / `exec` / `paths` / `lan`（39 个单测） |
 | M3 守护进程与安全护栏 | ✅ 主体完成 | `wifisync` 单二进制：`daemon`（生命周期 + 准入 + 下发 + 看门狗）、`rpc`、`link`（Controller 连接）、`accounts`、`ctl`、`ubus`(rpcd 插件)、`secrets`、`probe`、`signals`、`log`（44 个单测） |

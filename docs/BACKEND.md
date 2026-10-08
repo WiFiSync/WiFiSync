@@ -456,7 +456,7 @@ wifisync ubus ...        # rpcd exec plugin mode
 
 | Milestone | Status | Output |
 |-----------|--------|--------|
-| M0 Feasibility | ✅ done (toolchain / arch mapping / build chain) | `scripts/openwrt-arch.sh`, `scripts/sdk-env.sh`, `scripts/build-musl.sh`, two CI workflows |
+| M0 Feasibility | ✅ done (toolchain / arch mapping / build chain) | `scripts/openwrt-arch.sh`, `scripts/sdk-env.sh`, `scripts/build-musl.sh`, three CI workflows |
 | M1 Core logic library | ✅ done | `wifisync-core`: `role` / `capability` / `bridge` / `wifi_source` / `profile` / `admission` / `backup` / `failsafe` / `plan` / `uci_file` / `config` / `lan` / `link` (91 unit tests) |
 | M2 System adapter layer | ✅ done (read-only probing + snapshot/restore + AP write path) | `wifisync-sys`: `sysfs` / `iwinfo` / `uci` / `netifd` / `snapshot` / `restore` / `state` / `exec` / `paths` / `lan` (39 unit tests) |
 | M3 Daemon and safety rails | ✅ mainly done | the single `wifisync` binary: `daemon` (lifecycle + admission + distribution + watchdog), `rpc`, `link` (Controller link), `accounts`, `ctl`, `ubus` (rpcd plugin), `secrets`, `probe`, `signals`, `log` (44 unit tests) |

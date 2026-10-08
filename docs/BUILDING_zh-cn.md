@@ -135,26 +135,9 @@ cargo run -- plan      # 角色为 controller+gateway 时输出 "0 项改动"
 
 | 工作流 | 触发 | 内容 |
 |--------|------|------|
-| `ci.yml` | push / PR / 手动 | 只做源码检查：`fmt` + `clippy -D warnings` + `cargo test` + 端到端冒烟测试（均按 `x86_64-unknown-linux-musl` 目标编译） |
-| `release.yml` | 仅手动触发：在 dispatch 表单里填写 tag | 7 个架构的官方 **.ipk（24.10）/ .apk（25.12）** 包 + 与架构无关的 `luci-app-wifisync` 包、二进制体积门禁、sha256 与 GitHub Release 上传 |
-
-`release.yml` 是唯一构建可安装包的地方，且只发行两个 OpenWrt 版本：**24.10** 出
-`.ipk`、**25.12** 出 `.apk`。每个产物是一个 tarball，命名形如
-`wifisync-<tag>-openwrt-24.10-<架构>.tar.gz`（apk 那条线是 `…-25.12-…`）；此外每个版本各有一个
-`wifisync-<tag>-openwrt-24.10-luci.tar.gz` 装 LuCI 应用与翻译（这些包与架构无关，所以按版本各一份
-而不是按架构各一份）。每个 tarball 里的 `package-info.json` 记录了它来自哪个具体的 SDK 版本。
-
-### 手动发布
-
-`release.yml` 没有 tag 推送触发器，因为 tag 是输入项。一次运行的流程是：
-
-1. 校验 tag（只允许字母、数字、`.`、`_`、`-`）并检查它是否存在：不存在则在本次 dispatch 的
-   commit 上创建，存在则由它决定构建哪个 commit；
-2. 为该 commit 构建包；
-3. 删除该 tag 上一次运行留下的 release，再发布本次的——tag 本身从不被改写。
-
-某个架构单独失败时，用运行页面上的「Re-run failed jobs」重跑，而不是在这里构建一个子集，
-因此发布出去的 release 永远不会是残缺的。
+| `ci.yml` | push / PR / 手动 | ① `fmt` + `clippy -D warnings` + `cargo test` + 端到端冒烟测试（均按 `x86_64-unknown-linux-musl` 目标编译）<br>② `shellcheck` + JSON 校验 + `node --check`（LuCI JS）+ 视图 `_()` 词条与 `po/*` 的覆盖比对 + 后端消息键与前端 `MESSAGES` 表的一致性比对<br>③ 7 个架构用 SDK 工具链交叉编译 + 体积门禁 + 上传产物<br>④ 用 `openwrt/gh-action-sdk` 构建 `luci-app-wifisync` 验证 feed 包结构 |
+| `openwrt-packages.yml` | 手动 / 每月 | 7 个架构的**官方 .apk/.ipk** 构建（慢，含 rustc 引导） |
+| `release.yml` | 打 tag `v*` | 7 个架构编译 + sha256 + 发布到 GitHub Release（含架构对照表） |
 
 ### 冒烟测试里被强制的「零侵入」不变量
 
